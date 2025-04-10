@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Education & Course Recommender</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+<body>
+    <div class="header">
+        <div class="nav-content">
+            <h1><i class="fas fa-graduation-cap"></i> Education & Course Recommender</h1>
+            <p class="subtitle">Choose your path to success</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="choice-cards">
+            <a href="{{ url_for('education') }}" class="choice-card education">
+                <div class="card-icon">
+                    <i class="fas fa-university"></i>
+                </div>
+                <h2>Education Stream Recommendation</h2>
+                <p>Get personalized recommendations for your educational path based on your academic performance and interests.</p>
+                <div class="card-footer">
+                    <span>Get Started <i class="fas fa-arrow-right"></i></span>
+                </div>
+            </a>
+
+            <a href="{{ url_for('courses') }}" class="choice-card courses">
+                <div class="card-icon">
+                    <i class="fas fa-laptop-code"></i>
+                </div>
+                <h2>Professional Course Recommendation</h2>
+                <p>Discover relevant courses tailored to your profession and career goals.</p>
+                <div class="card-footer">
+                    <span>Get Started <i class="fas fa-arrow-right"></i></span>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <footer>
+        <p>Made with <i class="fas fa-heart"></i> for lifelong learning</p>
+    </footer>
+</body>
+</html>

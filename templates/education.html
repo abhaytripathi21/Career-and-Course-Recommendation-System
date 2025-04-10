@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Education Stream Recommender</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+<body>
+    <div class="header">
+        <div class="nav-content">
+            <h1><i class="fas fa-university"></i> Education Stream Recommender</h1>
+            <p class="subtitle">Find your ideal educational path</p>
+            <a href="{{ url_for('home') }}" class="back-button">
+                <i class="fas fa-home"></i> Back to Home
+            </a>
+        </div>
+    </div>
+
+    <div class="container">
+        {% if error %}
+            <div class="error-message">
+                <i class="fas fa-exclamation-circle"></i>
+                {{ error }}
+            </div>
+        {% endif %}
+
+        <div class="form-section">
+            <div class="form-header">
+                <h2>Enter Your Details</h2>
+                <button type="button" class="test-data-button" onclick="fillTestData()">
+                    <i class="fas fa-vial"></i> Fill Test Data
+                </button>
+            </div>
+            
+            <form action="{{ url_for('recommend_education') }}" method="post" onsubmit="return validateForm()">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="gender">Gender:</label>
+                        <select name="gender" id="gender" required>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="part_time_job">Part-time Job:</label>
+                        <select name="part_time_job" id="part_time_job" required>
+                            <option value="1">Yes</option>
+                            <option value="0">No</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="absence_days">Absence Days:</label>
+                        <input type="number" id="absence_days" name="absence_days" min="0" max="365" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="extracurricular_activities">Extracurricular Activities:</label>
+                        <select name="extracurricular_activities" id="extracurricular_activities" required>
+                            <option value="1">Yes</option>
+                            <option value="0">No</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="weekly_self_study_hours">Weekly Self-Study Hours:</label>
+                        <input type="number" id="weekly_self_study_hours" name="weekly_self_study_hours" min="0" max="168" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="math_score">Math Score:</label>
+                        <input type="number" id="math_score" name="math_score" min="0" max="100" onchange="calculateScores()" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="history_score">History Score:</label>
+                        <input type="number" id="history_score" name="history_score" min="0" max="100" onchange="calculateScores()" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="physics_score">Physics Score:</label>
+                        <input type="number" id="physics_score" name="physics_score" min="0" max="100" onchange="calculateScores()" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="chemistry_score">Chemistry Score:</label>
+                        <input type="number" id="chemistry_score" name="chemistry_score" min="0" max="100" onchange="calculateScores()" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="biology_score">Biology Score:</label>
+                        <input type="number" id="biology_score" name="biology_score" min="0" max="100" onchange="calculateScores()" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="english_score">English Score:</label>
+                        <input type="number" id="english_score" name="english_score" min="0" max="100" onchange="calculateScores()" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="geography_score">Geography Score:</label>
+                        <input type="number" id="geography_score" name="geography_score" min="0" max="100" onchange="calculateScores()" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="total_score">Total Score:</label>
+                        <input type="number" id="total_score" name="total_score" readonly>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="average_score">Average Score:</label>
+                        <input type="number" id="average_score" name="average_score" readonly>
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-button">
+                    <i class="fas fa-graduation-cap"></i> Get Recommendations
+                </button>
+            </form>
+        </div>
+
+        {% if recommendations %}
+            <div class="results-section">
+                <h2><i class="fas fa-chart-bar"></i> Your Career Path Recommendations</h2>
+                <div class="recommendation-cards">
+                    {% for career, probability in recommendations %}
+                        <div class="recommendation-card">
+                            <div class="stream-name">{{ career }}</div>
+                            <div class="probability">
+                                <div class="progress-bar">
+                                    <div class="progress" style="width: {{ probability }}%"></div>
+                                </div>
+                                <span class="percentage">{{ "%.1f"|format(probability) }}% Match</span>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                <div class="recommendation-note">
+                    <p><i class="fas fa-info-circle"></i> These career recommendations are based on your academic performance, study habits, and personal factors.</p>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <footer>
+        <p>Made with <i class="fas fa-heart"></i> for educational excellence</p>
+    </footer>
+
+    <script>
+        function calculateScores() {
+            var mathScore = parseFloat(document.getElementById("math_score").value) || 0;
+            var historyScore = parseFloat(document.getElementById("history_score").value) || 0;
+            var physicsScore = parseFloat(document.getElementById("physics_score").value) || 0;
+            var chemistryScore = parseFloat(document.getElementById("chemistry_score").value) || 0;
+            var biologyScore = parseFloat(document.getElementById("biology_score").value) || 0;
+            var englishScore = parseFloat(document.getElementById("english_score").value) || 0;
+            var geographyScore = parseFloat(document.getElementById("geography_score").value) || 0;
+
+            var totalScore = mathScore + historyScore + physicsScore + chemistryScore + biologyScore + englishScore + geographyScore;
+            var averageScore = totalScore / 7;
+
+            document.getElementById("total_score").value = totalScore.toFixed(2);
+            document.getElementById("average_score").value = averageScore.toFixed(2);
+        }
+
+        function validateForm() {
+            var scores = ["math_score", "history_score", "physics_score", "chemistry_score", 
+                         "biology_score", "english_score", "geography_score"];
+            
+            for (var i = 0; i < scores.length; i++) {
+                var score = document.getElementById(scores[i]).value;
+                if (score < 0 || score > 100) {
+                    alert("All scores must be between 0 and 100");
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        function fillTestData() {
+            // Sample data for a science-oriented student
+            document.getElementById("gender").value = "male";
+            document.getElementById("part_time_job").value = "0";
+            document.getElementById("absence_days").value = "5";
+            document.getElementById("extracurricular_activities").value = "1";
+            document.getElementById("weekly_self_study_hours").value = "20";
+            document.getElementById("math_score").value = "92";
+            document.getElementById("history_score").value = "78";
+            document.getElementById("physics_score").value = "88";
+            document.getElementById("chemistry_score").value = "90";
+            document.getElementById("biology_score").value = "85";
+            document.getElementById("english_score").value = "82";
+            document.getElementById("geography_score").value = "75";
+            
+            // Calculate total and average scores
+            calculateScores();
+        }
+    </script>
+
+    <style>
+        .form-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-header h2 {
+            margin: 0;
+            color: var(--secondary-color);
+        }
+
+        .test-data-button {
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: background-color 0.3s ease;
+        }
+
+        .test-data-button:hover {
+            background-color: #34495e;
+        }
+
+        .test-data-button i {
+            font-size: 1rem;
+        }
+    </style>
+</body>
+</html>

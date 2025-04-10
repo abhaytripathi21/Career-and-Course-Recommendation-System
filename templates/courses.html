@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional Course Recommender</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+<body>
+    <div class="header">
+        <div class="nav-content">
+            <h1><i class="fas fa-laptop-code"></i> Professional Course Recommender</h1>
+            <p class="subtitle">Find courses tailored to your profession</p>
+            <a href="{{ url_for('home') }}" class="back-button">
+                <i class="fas fa-home"></i> Back to Home
+            </a>
+        </div>
+    </div>
+
+    <div class="container">
+        {% if error %}
+            <div class="error-message">
+                <i class="fas fa-exclamation-circle"></i>
+                {{ error }}
+            </div>
+        {% endif %}
+
+        <div class="form-section">
+            <form action="{{ url_for('recommend_courses') }}" method="post">
+                <div class="form-group">
+                    <label for="profession">Select Your Profession:</label>
+                    <select name="profession" id="profession" required>
+                        <option value="">Choose a profession...</option>
+                        {% for prof in professions %}
+                            <option value="{{ prof }}" {% if profession == prof %}selected{% endif %}>{{ prof }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <button type="submit" class="submit-button">
+                    <i class="fas fa-search"></i> Find Courses
+                </button>
+            </form>
+        </div>
+
+        {% if recommended_courses %}
+            <div class="results-section">
+                <h2><i class="fas fa-graduation-cap"></i> Recommended Courses for {{ profession }}</h2>
+                <div class="course-cards">
+                    {% for course in recommended_courses %}
+                        <div class="course-card">
+                            <div class="course-header">
+                                <h3>{{ course.title }}</h3>
+                                <span class="category">{{ course.category }}</span>
+                            </div>
+                            <div class="course-details">
+                                <p><i class="fas fa-user-tie"></i> {{ course.instructor }}</p>
+                                <p><i class="fas fa-layer-group"></i> {{ course.level }}</p>
+                                <p><i class="fas fa-star"></i> {{ course.rating }}/5.0</p>
+                                <p><i class="fas fa-clock"></i> {{ course.duration }}</p>
+                                <p><i class="fas fa-tag"></i> {% if course.is_paid %}Paid{% else %}Free{% endif %}</p>
+                            </div>
+                            <a href="{{ course.url }}" target="_blank" class="course-link">
+                                View Course <i class="fas fa-external-link-alt"></i>
+                            </a>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <footer>
+        <p>Made with <i class="fas fa-heart"></i> for professional growth</p>
+    </footer>
+</body>
+</html>
